@@ -327,19 +327,21 @@
   <div id="loading"><div class="spinner"></div></div>
 
   <!-- ======== SCRIPTS ======== -->
-  <script src="https://accounts.google.com/gsi/client" onload="onGisLoaded()" async defer></script>
-  <script src="https://apis.google.com/js/api.js" onload="onGapiLoaded()" async defer></script>
-  <script src="zxing.min.js" defer></script>
+  <!-- App scripts first (synchronous) -->
+  <script src="zxing.min.js"></script>
+  <script src="tesseract.min.js"></script>
   <script src="sheets.js"></script>
   <script src="ui.js"></script>
   <script src="gestures.js"></script>
-  <script src="tesseract.min.js"></script>
   <script src="clipboard.js"></script>
   <script src="scanner.js"></script>
   <script src="ocr.js"></script>
   <script src="rules.js"></script>
   <script src="offline.js"></script>
   <script src="app.js"></script>
+  <!-- Google scripts AFTER app.js so onGisLoaded/onGapiLoaded exist -->
+  <script src="https://accounts.google.com/gsi/client" onload="onGisLoaded()" async></script>
+  <script src="https://apis.google.com/js/api.js" onload="onGapiLoaded()" async></script>
 
   <!-- Service Worker -->
   <script>

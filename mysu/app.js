@@ -80,18 +80,32 @@ const App = (() => {
   function login() {
     if (tokenClient) {
       tokenClient.requestAccessToken();
-    } else {
-      // Google script not loaded yet — try to init and retry
-      UI.showToast('Chargement Google en cours...');
-      setTimeout(() => {
-        if (typeof google !== 'undefined' && google.accounts) {
-          onGisLoaded();
-          tokenClient.requestAccessToken();
-        } else {
-          UI.showToast('Erreur : Google ne se charge pas. Vérifie ta connexion et recharge la page.');
-        }
-      }, 2000);
+      return;
     }
+
+    // Google script not loaded yet — try to init
+    if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+      onGisLoaded();
+      if (tokenClient) {
+        tokenClient.requestAccessToken();
+        return;
+      }
+    }
+
+    // Still not ready — wait and retry
+    UI.showToast('Chargement Google en cours...');
+    let attempts = 0;
+    const retry = setInterval(() => {
+      attempts++;
+      if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+        clearInterval(retry);
+        onGisLoaded();
+        tokenClient.requestAccessToken();
+      } else if (attempts >= 10) {
+        clearInterval(retry);
+        UI.showToast('Google ne se charge pas. Recharge la page (tire vers le bas).');
+      }
+    }, 1000);
   }
 
   function logout() {
