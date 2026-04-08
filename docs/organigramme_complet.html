@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MySU — Organigramme Complet</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a1a2e; padding: 20px; }
+h1 { text-align: center; color: #2F5496; margin-bottom: 10px; font-size: 28px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 40px; font-size: 14px; }
+
+/* Section */
+.section {
+  background: white; border-radius: 16px; padding: 30px; margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08); max-width: 900px; margin-left: auto; margin-right: auto;
+}
+.section-title {
+  font-size: 20px; font-weight: bold; color: white; background: #2F5496;
+  padding: 12px 24px; border-radius: 10px; margin-bottom: 24px; text-align: center;
+}
+
+/* Flow elements */
+.flow { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.node {
+  padding: 14px 24px; border-radius: 12px; text-align: center;
+  max-width: 340px; width: 100%; font-size: 14px; line-height: 1.5; position: relative;
+}
+.start { background: #2F5496; color: white; border-radius: 50px; font-weight: bold; }
+.action { background: #e8f0fe; border: 2px solid #2F5496; color: #2F5496; font-weight: 600; }
+.decision {
+  background: #fff3cd; border: 2px solid #f0ad4e; color: #856404;
+  transform: rotate(0deg); font-weight: 600;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  padding: 30px 20px; min-height: 100px; display: flex; align-items: center; justify-content: center;
+}
+.result { background: #d4edda; border: 2px solid #28a745; color: #155724; }
+.result-red { background: #f8d7da; border: 2px solid #dc3545; color: #721c24; }
+.result-blue { background: #d1ecf1; border: 2px solid #17a2b8; color: #0c5460; }
+.result-gray { background: #e9ecef; border: 2px solid #6c757d; color: #383d41; }
+.result-orange { background: #fff3cd; border: 2px solid #ffc107; color: #856404; }
+
+/* Arrows */
+.arrow {
+  width: 3px; height: 30px; background: #2F5496; position: relative;
+}
+.arrow::after {
+  content: ''; position: absolute; bottom: -6px; left: -5px;
+  border-left: 7px solid transparent; border-right: 7px solid transparent;
+  border-top: 8px solid #2F5496;
+}
+.arrow-label {
+  font-size: 12px; color: #2F5496; font-weight: bold; text-align: center;
+  margin: -4px 0; padding: 2px 8px; background: #f0f4f8; border-radius: 4px;
+}
+
+/* Split branches */
+.branches {
+  display: flex; gap: 20px; justify-content: center; width: 100%; flex-wrap: wrap;
+  margin-top: 5px;
+}
+.branch {
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+  flex: 1; min-width: 200px; max-width: 380px;
+}
+.branch-label {
+  font-size: 13px; font-weight: bold; color: white; padding: 6px 16px;
+  border-radius: 20px; margin-bottom: 8px;
+}
+.branch-label.green { background: #28a745; }
+.branch-label.red { background: #dc3545; }
+.branch-label.blue { background: #2F5496; }
+.branch-label.orange { background: #f0ad4e; color: #333; }
+.branch-label.gray { background: #6c757d; }
+
+/* Connector line */
+.connector {
+  width: 100%; height: 3px; background: #2F5496; margin: 10px 0; position: relative;
+  max-width: 600px;
+}
+
+/* Table display */
+.table-demo {
+  width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px;
+}
+.table-demo th { background: #2F5496; color: white; padding: 8px 10px; text-align: left; }
+.table-demo td { padding: 8px 10px; border: 1px solid #ddd; }
+.table-demo tr.green-row { background: #d4edda; }
+.table-demo tr.gray-row { background: #e9ecef; }
+.table-demo tr.strike-row { background: #f8d7da; text-decoration: line-through; }
+
+/* Bar */
+.action-bar {
+  display: flex; gap: 0; width: 100%; max-width: 500px; margin: 15px auto;
+  border-radius: 14px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+.action-bar .btn {
+  flex: 1; padding: 16px 10px; text-align: center; font-weight: bold;
+  font-size: 15px; color: white; cursor: default;
+}
+.btn-menu { background: #6c757d; }
+.btn-scan { background: #17a2b8; }
+.btn-add { background: #28a745; font-size: 22px !important; }
+.btn-email { background: #f0ad4e; color: #333 !important; }
+
+/* Info box */
+.info-box {
+  background: #f8f9fa; border-left: 4px solid #2F5496; padding: 12px 16px;
+  margin: 10px 0; border-radius: 0 8px 8px 0; font-size: 13px;
+}
+.info-box.warning { border-left-color: #dc3545; background: #fff5f5; }
+.info-box.success { border-left-color: #28a745; background: #f0fff4; }
+
+/* Gesture cards */
+.gesture-cards { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+.gesture-card {
+  flex: 1; min-width: 220px; max-width: 280px; border-radius: 12px;
+  padding: 16px; text-align: center;
+}
+.gesture-icon { font-size: 36px; margin-bottom: 8px; }
+.gesture-name { font-weight: bold; font-size: 16px; margin-bottom: 6px; }
+.gesture-desc { font-size: 13px; line-height: 1.4; }
+
+/* Checklist */
+.checklist { list-style: none; padding: 0; }
+.checklist li {
+  padding: 10px 14px; margin: 6px 0; background: #f8f9fa; border-radius: 8px;
+  font-size: 14px; border-left: 4px solid #2F5496;
+}
+.checklist li strong { color: #2F5496; }
+
+/* Format block */
+.format-block {
+  background: #1a1a2e; color: #a8d8ea; padding: 16px; border-radius: 10px;
+  font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8;
+  margin: 10px 0;
+}
+
+/* Badge */
+.badge {
+  display: inline-block; background: #dc3545; color: white; font-size: 11px;
+  padding: 2px 8px; border-radius: 20px; font-weight: bold; vertical-align: super;
+}
+
+.phase-tag {
+  display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px;
+  font-weight: bold; margin-left: 10px; vertical-align: middle;
+}
+.phase-1 { background: #28a745; color: white; }
+.phase-2 { background: #17a2b8; color: white; }
+.phase-3 { background: #f0ad4e; color: #333; }
+.phase-4 { background: #6f42c1; color: white; }
+.phase-5 { background: #6c757d; color: white; }
+
+.legend {
+  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.legend-dot { width: 14px; height: 14px; border-radius: 50%; }
+
+@media (max-width: 600px) {
+  body { padding: 10px; }
+  .section { padding: 16px; }
+  .node { max-width: 100%; font-size: 13px; padding: 10px 16px; }
+  .branches { flex-direction: column; align-items: center; }
+  .branch { max-width: 100%; }
+  .gesture-cards { flex-direction: column; align-items: center; }
+  .gesture-card { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<h1>MySU — Organigramme Complet</h1>
+<p class="subtitle">My Stock Unit — PWA Inventaire TPE | Version finale — Avril 2026</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#28a745"></div> Phase 1 — Socle</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#17a2b8"></div> Phase 2 — Scan</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f0ad4e"></div> Phase 3 — Email</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#6f42c1"></div> Phase 4 — OCR</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#6c757d"></div> Phase 5 — Avancé</div>
+</div>
+
+<!-- ==================== SECTION 1 ==================== -->
+<div class="section">
+  <div class="section-title">1. DEMARRAGE DE L'APP <span class="phase-tag phase-1">Phase 1</span></div>
+  <div class="flow">
+    <div class="node start">Ouvrir MySU</div>
+    <div class="arrow"></div>
+    <div class="node decision">Inventaire existant en mémoire ?</div>
+    <div class="connector"></div>
+    <div class="branches">
+      <div class="branch">
+        <span class="branch-label green">OUI</span>
+        <div class="node action">Connexion OAuth automatique</div>
+        <div class="arrow"></div>
+        <div class="node result">Afficher le TABLEAU</div>
+      </div>
+      <div class="branch">
+        <span class="branch-label blue">NON — Onboarding</span>
+        <div class="node action">1. Connexion Google (OAuth2)</div>
+        <div class="arrow"></div>
+        <div class="node action">2. Google Picker (Sheet existant)<br>OU Création auto "inventaire_mois_année"</div>
+        <div class="arrow"></div>
+        <div class="node action">3. Vérification présence sur Drive</div>
+        <div class="arrow"></div>
+        <div class="node result">Afficher le TABLEAU</div>
+      </div>
+    </div>
+  </div>
+  <div class="info-box">Pas d'écran d'accueil. L'app s'ouvre DIRECTEMENT sur le tableau d'inventaire. L'onboarding sert aussi pour les collègues qui utilisent l'app la première fois.</div>
+</div>
+
+<!-- ==================== SECTION 2 ==================== -->
+<div class="section">
+  <div class="section-title">2. ECRAN PRINCIPAL — LE TABLEAU <span class="phase-tag phase-1">Phase 1</span></div>
+
+  <h3 style="color:#2F5496; margin-bottom:12px;">Tableau 1 — Stock</h3>
+  <table class="table-demo">
+    <tr><th>☐</th><th>Produit</th><th>TPE</th><th>Base</th><th>Banque</th><th>Date</th><th>Client</th></tr>
+    <tr><td>☐</td><td>A920PRO</td><td>1850328645</td><td>2230572347</td><td>JDC</td><td>08/04/2026</td><td>MLSTECH / BARDOUX A.</td></tr>
+    <tr class="green-row"><td>☐</td><td>DESK1600</td><td>232347...</td><td>—</td><td>CRCA31</td><td>07/04/2026</td><td>Client X</td></tr>
+    <tr class="gray-row"><td>☐</td><td>MOVE5000</td><td>232257...</td><td>202007...</td><td>JDC</td><td>06/04/2026</td><td>Collègue Y</td></tr>
+    <tr class="strike-row"><td>☐</td><td>P2PRO</td><td>987654...</td><td>123456...</td><td>JDC</td><td>05/04/2026</td><td>MLSTECH / BARDOUX A.</td></tr>
+  </table>
+
+  <div style="text-align:center; color:#999; padding: 8px;">— ligne vide de séparation —</div>
+
+  <h3 style="color:#2F5496; margin-bottom:12px;">Tableau 2 — Demandes d'intervention</h3>
+  <table class="table-demo">
+    <tr><th>Demande</th><th>Compte</th><th>Raison Sociale</th></tr>
+    <tr><td>Remplacement TPE</td><td>12345</td><td>Boulangerie Martin</td></tr>
+  </table>
+
+  <div style="margin-top: 20px;">
+    <div class="gesture-cards">
+      <div class="gesture-card" style="background:#d4edda; border: 2px solid #28a745;">
+        <div style="font-size: 24px;">🟢</div>
+        <div class="gesture-name">Fond VERT</div>
+        <div class="gesture-desc">Posé chez client<br>Bouton ✕ pour supprimer</div>
+      </div>
+      <div class="gesture-card" style="background:#e9ecef; border: 2px solid #6c757d;">
+        <div style="font-size: 24px;">⚪</div>
+        <div class="gesture-name">Fond GRIS</div>
+        <div class="gesture-desc">Transféré à un collègue<br>Bouton ✕ pour supprimer</div>
+      </div>
+      <div class="gesture-card" style="background:#f8d7da; border: 2px solid #dc3545;">
+        <div style="font-size: 24px; text-decoration: line-through;">ABC</div>
+        <div class="gesture-name">Police RAILLEE</div>
+        <div class="gesture-desc">Supprimé<br>Bouton ✕ pour confirmer</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 3 ==================== -->
+<div class="section">
+  <div class="section-title">3. GESTES SUR LES LIGNES <span class="phase-tag phase-1">Phase 1</span></div>
+  <div class="gesture-cards">
+    <div class="gesture-card" style="background: #e8f0fe; border: 2px solid #2F5496;">
+      <div class="gesture-icon">👉</div>
+      <div class="gesture-name">SWIPE DROITE</div>
+      <div class="gesture-desc"><strong>= SORTIE</strong></div>
+      <div style="margin-top:12px; text-align:left;">
+        <div style="padding:6px 0;">▸ <strong>Poser chez client</strong><br>&nbsp;&nbsp;→ Ligne fond vert<br>&nbsp;&nbsp;→ Cochage + copier/coller</div>
+        <hr style="border:none;border-top:1px solid #ccc;margin:6px 0;">
+        <div style="padding:6px 0;">▸ <strong>Transférer collègue</strong><br>&nbsp;&nbsp;→ Ligne fond gris<br>&nbsp;&nbsp;→ Cochage + ouvre Gmail</div>
+      </div>
+    </div>
+    <div class="gesture-card" style="background: #fff5f5; border: 2px solid #dc3545;">
+      <div class="gesture-icon">👈</div>
+      <div class="gesture-name">SWIPE GAUCHE</div>
+      <div class="gesture-desc"><strong>= RETOUR</strong></div>
+      <div style="margin-top:12px; text-align:left;">
+        <div style="padding:6px 0;">▸ <strong>Renvoyer en agence</strong><br>&nbsp;&nbsp;→ Option supprimer article(s) ou ligne</div>
+        <hr style="border:none;border-top:1px solid #ccc;margin:6px 0;">
+        <div style="padding:6px 0;">▸ <strong>Supprimer</strong><br>&nbsp;&nbsp;→ Ligne raillée<br>&nbsp;&nbsp;→ Confirmation<br>&nbsp;&nbsp;→ Suppression Sheet API</div>
+      </div>
+    </div>
+    <div class="gesture-card" style="background: #f3e8ff; border: 2px solid #6f42c1;">
+      <div class="gesture-icon">👆</div>
+      <div class="gesture-name">APPUI LONG</div>
+      <div class="gesture-desc"><strong>= EDITION LIBRE</strong></div>
+      <div style="margin-top:12px;">
+        <div style="padding:6px 0;">Ouvre Google Sheet<br>dans le navigateur<br>pour modifier directement</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 4 ==================== -->
+<div class="section">
+  <div class="section-title">4. BARRE D'ACTIONS (fixe en bas)</div>
+  <div class="action-bar">
+    <div class="btn btn-menu">☰ Menu</div>
+    <div class="btn btn-scan">📷 Scan/OCR</div>
+    <div class="btn btn-add">＋</div>
+    <div class="btn btn-email">✉ Email <span class="badge">5</span></div>
+  </div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:20px; justify-content:center;">
+    <div style="flex:1;min-width:180px;text-align:center;padding:8px;background:#f8f9fa;border-radius:8px;font-size:13px;">
+      <strong style="color:#6c757d;">Menu</strong><br>Paramètres<br><span class="phase-tag phase-1" style="margin:0">Phase 1</span>
+    </div>
+    <div style="flex:1;min-width:180px;text-align:center;padding:8px;background:#f8f9fa;border-radius:8px;font-size:13px;">
+      <strong style="color:#17a2b8;">Scan/OCR</strong><br>Barcode + Photo<br><span class="phase-tag phase-2" style="margin:0">Phase 2</span> <span class="phase-tag phase-4" style="margin:0">Phase 4</span>
+    </div>
+    <div style="flex:1;min-width:180px;text-align:center;padding:8px;background:#f8f9fa;border-radius:8px;font-size:13px;">
+      <strong style="color:#28a745;">+ Ajout</strong><br>Formulaire manuel<br><span class="phase-tag phase-1" style="margin:0">Phase 1</span>
+    </div>
+    <div style="flex:1;min-width:180px;text-align:center;padding:8px;background:#f8f9fa;border-radius:8px;font-size:13px;">
+      <strong style="color:#f0ad4e;">Email</strong><br>Panier cumulatif<br><span class="phase-tag phase-3" style="margin:0">Phase 3</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 5 ==================== -->
+<div class="section">
+  <div class="section-title">5. BOUTON MENU — Paramètres <span class="phase-tag phase-1">Phase 1</span></div>
+  <div style="background:#f8f9fa; border-radius:12px; padding:20px; max-width:400px; margin:0 auto;">
+    <div style="font-size:18px; font-weight:bold; color:#2F5496; margin-bottom:16px; border-bottom:2px solid #2F5496; padding-bottom:8px;">☰ Paramètres</div>
+    <ul class="checklist">
+      <li><strong>Nom du fichier</strong> Sheet (modifiable)</li>
+      <li><strong>ID du fichier</strong> Sheet (modifiable)</li>
+      <li><strong>Compte Google</strong> connecté + "Changer de compte"</li>
+      <li><strong>Thème</strong> : clair / sombre</li>
+      <li><strong>Ordre des colonnes</strong> (réordonnables)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== SECTION 6 ==================== -->
+<div class="section">
+  <div class="section-title">6. BOUTON SCAN/OCR</div>
+
+  <h3 style="color:#17a2b8; margin-bottom:16px; text-align:center;">Mode A — Scan Barcode (ZXing-js) <span class="phase-tag phase-2">Phase 2</span></h3>
+  <div class="flow">
+    <div class="node action">Ouvre caméra (overlay 3/4 écran, tableau visible en dessous)</div>
+    <div class="arrow"></div>
+    <div class="node action">ZXing détecte le barcode en temps réel</div>
+    <div class="arrow"></div>
+    <div class="node decision">Trouvé dans le stock ?</div>
+    <div class="connector"></div>
+    <div class="branches">
+      <div class="branch">
+        <span class="branch-label green">OUI — Reconnu</span>
+        <div class="node result">Affiche la ligne correspondante</div>
+        <div class="arrow"></div>
+        <div class="node action">Choix : Poser / Transférer / Supprimer</div>
+      </div>
+      <div class="branch">
+        <span class="branch-label orange">NON — Inconnu</span>
+        <div class="node result-orange">Proposer ajout au stock</div>
+        <div class="arrow"></div>
+        <div class="node action">Formulaire pré-rempli si possible</div>
+      </div>
+    </div>
+  </div>
+
+  <hr style="margin: 30px 0; border: none; border-top: 2px dashed #ddd;">
+
+  <h3 style="color:#6f42c1; margin-bottom:16px; text-align:center;">Mode B — Photo Etiquette (Tesseract.js) <span class="phase-tag phase-4">Phase 4</span></h3>
+  <div class="flow">
+    <div class="node action">Ouvre caméra OU sélection depuis la galerie</div>
+    <div class="arrow"></div>
+    <div class="node decision">Image nette ?</div>
+    <div class="connector"></div>
+    <div class="branches">
+      <div class="branch">
+        <span class="branch-label green">OUI</span>
+        <div class="node action">OCR Tesseract analyse (100% local)</div>
+        <div class="arrow"></div>
+        <div class="node action">Extraction : produit, barcode(s), banque, date, client</div>
+        <div class="arrow"></div>
+        <div class="node decision">Type reconnu ?</div>
+        <div style="display:flex;gap:15px;margin-top:10px;flex-wrap:wrap;justify-content:center;">
+          <div style="text-align:center;">
+            <span class="branch-label green">OUI</span>
+            <div class="node result" style="margin-top:8px;font-size:13px;">Fiche pré-remplie<br>(tous champs modifiables)<br>→ VALIDER<br>→ Insertion alphabétique</div>
+          </div>
+          <div style="text-align:center;">
+            <span class="branch-label orange">NON</span>
+            <div class="node result-orange" style="margin-top:8px;font-size:13px;">MODE APPRENTISSAGE<br>(voir section 10)</div>
+          </div>
+        </div>
+      </div>
+      <div class="branch">
+        <span class="branch-label red">NON — Floue</span>
+        <div class="node result-red">% lisibilité affiché</div>
+        <div class="arrow"></div>
+        <div class="node result-blue">Photo sauvegardée sur Drive pour classement ultérieur</div>
+      </div>
+    </div>
+  </div>
+  <div class="info-box" style="margin-top:20px;">
+    <strong>Multi-articles :</strong> si la photo contient plusieurs étiquettes, OCR détecte N articles → traitement UN PAR UN → confirmation article par article.
+  </div>
+  <div class="info-box warning">
+    <strong>Règle absolue :</strong> barcode illisible = champ VIDE + ALERTE. Jamais de devinette.
+  </div>
+</div>
+
+<!-- ==================== SECTION 7 ==================== -->
+<div class="section">
+  <div class="section-title">7. BOUTON [+] — Ajout Manuel <span class="phase-tag phase-1">Phase 1</span></div>
+  <div style="background:#f8f9fa; border-radius:12px; padding:20px; max-width:450px; margin:0 auto;">
+    <div style="font-size:18px; font-weight:bold; color:#28a745; margin-bottom:16px; text-align:center;">＋ Ajouter un article</div>
+
+    <div style="margin-bottom:12px;">
+      <label style="font-weight:bold;font-size:13px;color:#555;">Produit</label>
+      <div style="background:white;border:2px solid #ddd;border-radius:8px;padding:10px;margin-top:4px;font-size:14px;color:#999;">
+        Liste déroulante (types connus) + "Nouveau type..."
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-weight:bold;font-size:13px;color:#555;">Barcode TPE</label>
+      <div style="background:white;border:2px solid #ddd;border-radius:8px;padding:10px;margin-top:4px;font-size:14px;color:#999;">
+        Saisie texte
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-weight:bold;font-size:13px;color:#555;">Barcode Base <span style="color:#aaa;">(si applicable)</span></label>
+      <div style="background:white;border:2px solid #ddd;border-radius:8px;padding:10px;margin-top:4px;font-size:14px;color:#999;">
+        Saisie texte (affiché seulement si le produit a une base)
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-weight:bold;font-size:13px;color:#555;">Banque</label>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <div style="background:#2F5496;color:white;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:bold;">JDC</div>
+        <div style="background:#e8f0fe;color:#2F5496;padding:8px 16px;border-radius:8px;font-size:13px;border:2px solid #2F5496;">CRCA31</div>
+        <div style="background:#f8f9fa;color:#666;padding:8px 16px;border-radius:8px;font-size:13px;border:2px solid #ddd;">Autre</div>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-weight:bold;font-size:13px;color:#555;">Date</label>
+      <div style="background:white;border:2px solid #ddd;border-radius:8px;padding:10px;margin-top:4px;font-size:14px;">
+        08/04/2026 (défaut : aujourd'hui)
+      </div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label style="font-weight:bold;font-size:13px;color:#555;">Client</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+        <div style="background:#2F5496;color:white;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:bold;">MLSTECH / BARDOUX A.</div>
+        <div style="background:#e8f0fe;color:#2F5496;padding:6px 12px;border-radius:8px;font-size:12px;">RECEP. (RET. GARANTIE)</div>
+        <div style="background:#e8f0fe;color:#2F5496;padding:6px 12px;border-radius:8px;font-size:12px;">RECEPTION</div>
+        <div style="background:#f8f9fa;color:#666;padding:6px 12px;border-radius:8px;font-size:12px;">Autre</div>
+      </div>
+    </div>
+    <div style="background:#28a745;color:white;padding:14px;border-radius:10px;text-align:center;font-weight:bold;font-size:16px;">
+      AJOUTER AU STOCK
+    </div>
+    <div style="text-align:center;margin-top:8px;font-size:12px;color:#888;">→ Insertion alphabétique automatique (tri colonne A)</div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 8 ==================== -->
+<div class="section">
+  <div class="section-title">8. SELECTION MULTI-ARTICLES <span class="phase-tag phase-3">Phase 3</span></div>
+  <div class="flow">
+    <div class="node action">☐ Cocher 1 ou plusieurs lignes dans le tableau</div>
+    <div class="arrow"></div>
+    <div style="background:#2F5496;color:white;padding:14px 24px;border-radius:10px;text-align:center;width:100%;max-width:550px;font-size:14px;">
+      <strong>3 article(s) sélectionné(s)</strong> —
+      <span style="background:white;color:#2F5496;padding:4px 12px;border-radius:6px;margin:0 4px;font-weight:bold;">Copier</span>
+      <span style="background:#f0ad4e;color:#333;padding:4px 12px;border-radius:6px;margin:0 4px;font-weight:bold;">Email</span>
+      <span style="background:#dc3545;color:white;padding:4px 12px;border-radius:6px;margin:0 4px;font-weight:bold;">Annuler</span>
+    </div>
+    <div class="connector"></div>
+    <div class="branches">
+      <div class="branch">
+        <span class="branch-label blue">Copier</span>
+        <div class="node result-blue">Copie le bloc formaté dans le presse-papier système</div>
+      </div>
+      <div class="branch">
+        <span class="branch-label orange">Email</span>
+        <div class="node result-orange">Ajoute les articles au PANIER EMAIL (cumulatif)</div>
+      </div>
+      <div class="branch">
+        <span class="branch-label red">Annuler</span>
+        <div class="node result-red">Désélectionne tout, bandeau disparaît</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 9 ==================== -->
+<div class="section">
+  <div class="section-title">9. BOUTON EMAIL — Panier Cumulatif <span class="phase-tag phase-3">Phase 3</span></div>
+  <div class="flow">
+    <div class="node action">Le panier accumule les articles au fil de la session<br>Badge compteur : ✉ Email <span class="badge">5</span></div>
+    <div class="arrow"></div>
+    <div class="node start" style="background:#f0ad4e;color:#333;">Tap sur le bouton Email</div>
+    <div class="arrow"></div>
+    <div class="node action">1. Copie TOUT le bloc formaté dans le presse-papier</div>
+    <div class="arrow"></div>
+    <div class="node action">2. Ouvre Gmail nativement</div>
+    <div class="arrow"></div>
+    <div class="node result">L'utilisateur colle, choisit destinataire, objet, et envoie quand il veut</div>
+  </div>
+
+  <div class="info-box warning" style="margin-top:20px; text-align:center; font-weight:bold;">
+    L'APP N'ENVOIE JAMAIS D'EMAIL ELLE-MEME
+  </div>
+
+  <h4 style="color:#2F5496; margin: 16px 0 8px;">Format du bloc copié :</h4>
+  <div class="format-block">
+Article 1 : MOVE5000 | TPE: 232257... | Base: 202007... | JDC
+Article 2 : A920PRO | TPE: 1850328645 | Base: 2230572347 | JDC
+Article 3 : DESK1600 | TPE: 232347... | CRCA31
+  </div>
+</div>
+
+<!-- ==================== SECTION 10 ==================== -->
+<div class="section">
+  <div class="section-title">10. MODE APPRENTISSAGE <span class="phase-tag phase-5">Phase 5</span></div>
+  <div class="info-box">Se déclenche quand l'OCR ne reconnaît pas le type d'étiquette.</div>
+  <div class="flow" style="margin-top:16px;">
+    <div class="node result-orange" style="font-weight:bold;">Etiquette inconnue détectée</div>
+    <div class="arrow"></div>
+    <div class="node action">Q1 : "Quel est le nom de ce produit ?"<br><em>Liste des types connus + "Nouveau type"</em></div>
+    <div class="arrow"></div>
+    <div class="node action">Q2 : "Tableau Stock ou Tableau Demandes ?"</div>
+    <div class="arrow"></div>
+    <div class="node action">Q3 : "Ce produit a-t-il une Base ?"<br><em>[Oui, même ligne] [Oui, séparée] [Non]</em></div>
+    <div class="arrow"></div>
+    <div class="node action">Q4 : "Quelle banque ?"<br><em>[JDC] [CRCA31] [Autre]</em></div>
+    <div class="arrow"></div>
+    <div class="node action">Q5 : "Quel client ?"<br><em>[MLSTECH] [RECEP.] [RECEPTION] [Autre]</em></div>
+    <div class="arrow"></div>
+    <div class="node result">Schéma MEMORISE<br>→ Appliqué auto aux prochaines étiquettes du même type<br>→ Stocké localStorage + JSON Google Drive</div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 11 ==================== -->
+<div class="section">
+  <div class="section-title">11. MODE OFFLINE <span class="phase-tag phase-5">Phase 5</span></div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:280px;">
+      <h4 style="color:#28a745; margin-bottom:12px;">✅ Fonctionne sans internet</h4>
+      <ul class="checklist">
+        <li>Voir le tableau (données en cache)</li>
+        <li>Scan barcode — ZXing (100% local)</li>
+        <li>OCR photo — Tesseract (100% local)</li>
+        <li>Recherche dans le stock (sur le cache)</li>
+        <li>Panier email (accumulation locale)</li>
+      </ul>
+    </div>
+    <div style="flex:1;min-width:280px;">
+      <h4 style="color:#f0ad4e; margin-bottom:12px;">⏳ Mis en file d'attente</h4>
+      <ul class="checklist">
+        <li><strong>Ajout</strong> d'article → stocké localement → envoyé à la reconnexion</li>
+        <li><strong>Suppression</strong> → stockée localement → exécutée à la reconnexion</li>
+      </ul>
+      <div style="background:#fff3cd;border:2px solid #f0ad4e;border-radius:10px;padding:12px;text-align:center;margin-top:12px;font-size:13px;">
+        ⚠ Mode offline — 3 opérations en attente
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 12 ==================== -->
+<div class="section">
+  <div class="section-title">12. REGLES METIER TPE</div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:250px;">
+      <h4 style="color:#2F5496;margin-bottom:10px;">Formats Barcode</h4>
+      <table class="table-demo">
+        <tr><th>Format</th><th>Barcode</th></tr>
+        <tr><td>Ingenico</td><td>24 chiffres</td></tr>
+        <tr><td>PAX</td><td>10 caractères</td></tr>
+        <tr><td>IWL</td><td>Alphanumérique mixte</td></tr>
+      </table>
+    </div>
+    <div style="flex:1;min-width:250px;">
+      <h4 style="color:#2F5496;margin-bottom:10px;">TPE + Base</h4>
+      <table class="table-demo">
+        <tr><th>Produit</th><th>Base</th></tr>
+        <tr><td>MOVE5000, A920PRO, P2PRO, IWL250, IWL253</td><td>Même ligne</td></tr>
+        <tr><td>AXIUM DX8000</td><td>Ligne séparée</td></tr>
+        <tr><td>DESK*, ICT250*, Q25, POL-*</td><td>Standalone (pas de base)</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="info-box warning" style="margin-top:16px;">
+    <strong>REGLE ABSOLUE :</strong> toujours prendre le LONG numéro sous le barcode. Ignorer S/N court (TCA...). Si illisible → BLANC + ALERTE, jamais deviner.
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+    <div class="info-box" style="flex:1;min-width:200px;"><strong>Banques :</strong> JDC (majorité), CRCA31</div>
+    <div class="info-box" style="flex:1;min-width:200px;"><strong>Client défaut :</strong> MLSTECH / BARDOUX A.</div>
+    <div class="info-box" style="flex:1;min-width:200px;"><strong>Date :</strong> JJ/MM/AAAA</div>
+    <div class="info-box" style="flex:1;min-width:200px;"><strong>Tri :</strong> alphabétique colonne A à chaque insertion</div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 13 ==================== -->
+<div class="section">
+  <div class="section-title">13. DECISIONS VALIDEES (07/04/2026)</div>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+    <div style="background:#d4edda;border-radius:10px;padding:12px 16px;flex:1;min-width:200px;max-width:280px;text-align:center;font-size:13px;">
+      <div style="font-size:20px;">✅</div>
+      <strong>Pas de Gmail API</strong><br>L'app prépare, tu envoies
+    </div>
+    <div style="background:#d4edda;border-radius:10px;padding:12px 16px;flex:1;min-width:200px;max-width:280px;text-align:center;font-size:13px;">
+      <div style="font-size:20px;">✅</div>
+      <strong>Pas de drag & drop</strong><br>Cochage + copier/coller
+    </div>
+    <div style="background:#d4edda;border-radius:10px;padding:12px 16px;flex:1;min-width:200px;max-width:280px;text-align:center;font-size:13px;">
+      <div style="font-size:20px;">✅</div>
+      <strong>Panier email cumulatif</strong><br>Accumule, copie tout d'un coup
+    </div>
+    <div style="background:#d4edda;border-radius:10px;padding:12px 16px;flex:1;min-width:200px;max-width:280px;text-align:center;font-size:13px;">
+      <div style="font-size:20px;">✅</div>
+      <strong>2 scopes OAuth</strong><br>Sheets + Drive.file
+    </div>
+    <div style="background:#d4edda;border-radius:10px;padding:12px 16px;flex:1;min-width:200px;max-width:280px;text-align:center;font-size:13px;">
+      <div style="font-size:20px;">✅</div>
+      <strong>Gestes swipe + appui long</strong><br>Navigation intuitive mobile
+    </div>
+    <div style="background:#d4edda;border-radius:10px;padding:12px 16px;flex:1;min-width:200px;max-width:280px;text-align:center;font-size:13px;">
+      <div style="font-size:20px;">✅</div>
+      <strong>3 couleurs de statut</strong><br>Vert / Gris / Raillé
+    </div>
+    <div style="background:#d4edda;border-radius:10px;padding:12px 16px;flex:1;min-width:200px;max-width:280px;text-align:center;font-size:13px;">
+      <div style="font-size:20px;">✅</div>
+      <strong>Multi-utilisateur</strong><br>Onboarding collègues
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center; padding: 30px 0; color: #999; font-size: 13px;">
+  MySU — My Stock Unit — MLSTECH / Anthonny BARDOUX — Avril 2026
+</div>
+
+</body>
+</html>

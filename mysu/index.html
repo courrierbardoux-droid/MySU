@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#2F5496">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>MySU</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- OFFLINE BANNER -->
+  <div id="offline-banner">⚠ Mode offline — données en cache</div>
+
+  <!-- ======== LOGIN SCREEN ======== -->
+  <div id="login-screen">
+    <img src="icon.svg" alt="MySU">
+    <h1>MySU</h1>
+    <p>My Stock Unit — Inventaire TPE</p>
+    <button id="btn-login">Se connecter avec Google</button>
+  </div>
+
+  <!-- ======== ONBOARDING SCREEN ======== -->
+  <div id="onboarding-screen">
+    <h2>Bienvenue sur MySU !</h2>
+    <p>Connecte ton inventaire Google Sheet ou crée-en un nouveau.</p>
+    <div class="onboard-buttons">
+      <button class="onboard-btn primary" id="btn-pick-existing">📂 Choisir un Sheet existant</button>
+      <button class="onboard-btn secondary" id="btn-create-new">✨ Créer un nouvel inventaire</button>
+    </div>
+  </div>
+
+  <!-- ======== MAIN APP ======== -->
+  <div id="app-screen">
+
+    <!-- Top bar -->
+    <div id="top-bar">
+      <div>
+        <h1>MySU</h1>
+        <div class="user-email" id="user-email"></div>
+      </div>
+      <button id="btn-refresh" title="Actualiser">🔄</button>
+    </div>
+
+    <!-- Selection banner -->
+    <div id="selection-banner">
+      <span class="sel-count" id="sel-count">0 article(s)</span>
+      <div class="sel-actions">
+        <button class="sel-btn sel-btn-copy" id="btn-sel-copy">Copier</button>
+        <button class="sel-btn sel-btn-email" id="btn-sel-email">Email</button>
+        <button class="sel-btn sel-btn-cancel" id="btn-sel-cancel">Annuler</button>
+      </div>
+    </div>
+
+    <!-- Table area -->
+    <div id="table-container">
+      <div class="table-section-title">Stock</div>
+      <table id="stock-table">
+        <thead>
+          <tr>
+            <th class="col-check">☐</th>
+            <th>Produit</th>
+            <th>TPE</th>
+            <th>Base</th>
+            <th>Banque</th>
+            <th>Date</th>
+            <th>Client</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">Chargement...</td></tr>
+        </tbody>
+      </table>
+
+      <div class="separator"></div>
+
+      <div class="table-section-title">Demandes d'intervention</div>
+      <table id="demandes-table">
+        <thead>
+          <tr>
+            <th>Demande</th>
+            <th>Compte</th>
+            <th>Raison Sociale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="3" style="text-align:center;color:#999;padding:20px;">Chargement...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Action bar -->
+    <div id="action-bar">
+      <button id="btn-menu">
+        <span class="bar-icon">☰</span>
+        <span class="bar-label">Menu</span>
+      </button>
+      <button id="btn-scan">
+        <span class="bar-icon">📷</span>
+        <span class="bar-label">Scan</span>
+      </button>
+      <button id="btn-add">
+        <span class="bar-icon">＋</span>
+        <span class="bar-label">Ajouter</span>
+      </button>
+      <button id="btn-email">
+        <span class="bar-icon">✉</span>
+        <span class="bar-label">Email</span>
+        <span class="email-badge" id="email-badge">0</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ======== SIDE MENU ======== -->
+  <div id="menu-overlay"></div>
+  <div id="side-menu">
+    <button id="btn-menu-close">✕</button>
+    <h2>☰ Paramètres</h2>
+
+    <div class="menu-group">
+      <label>Nom du fichier</label>
+      <input type="text" id="menu-sheet-name" placeholder="Inventaire Avril 2026">
+    </div>
+
+    <div class="menu-group">
+      <label>ID du Sheet</label>
+      <input type="text" id="menu-sheet-id" readonly>
+    </div>
+
+    <div class="menu-group">
+      <label>Compte Google</label>
+      <div id="menu-email" style="padding:10px 0;font-size:14px;color:#333;">—</div>
+    </div>
+
+    <div class="menu-group">
+      <label>Thème</label>
+      <div style="display:flex;gap:8px;">
+        <button class="choice-btn selected" id="btn-theme-light" data-theme="light">☀️ Clair</button>
+        <button class="choice-btn" id="btn-theme-dark" data-theme="dark">🌙 Sombre</button>
+      </div>
+    </div>
+
+    <button id="btn-change-sheet">📂 Changer de Sheet</button>
+    <button id="btn-logout">🚪 Se déconnecter</button>
+  </div>
+
+  <!-- ======== ADD FORM MODAL ======== -->
+  <div id="add-modal">
+    <div id="add-form">
+      <h2>＋ Ajouter un article</h2>
+
+      <div class="form-group">
+        <label>Produit</label>
+        <select id="add-product"></select>
+      </div>
+
+      <div class="form-group">
+        <label>Barcode TPE</label>
+        <input type="text" id="add-tpe" placeholder="Numéro du TPE" inputmode="numeric">
+      </div>
+
+      <div class="form-group" id="add-base-group">
+        <label>Barcode Base</label>
+        <input type="text" id="add-base" placeholder="Numéro de la base" inputmode="numeric">
+      </div>
+
+      <div class="form-group">
+        <label>Banque</label>
+        <input type="hidden" id="add-banque-value" value="JDC">
+        <div class="btn-group" id="banque-buttons">
+          <button type="button" class="choice-btn selected" data-value="JDC">JDC</button>
+          <button type="button" class="choice-btn" data-value="CRCA31">CRCA31</button>
+          <button type="button" class="choice-btn" data-value="">Autre</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="add-date">
+      </div>
+
+      <div class="form-group">
+        <label>Client</label>
+        <input type="hidden" id="add-client-value" value="MLSTECH / BARDOUX A.">
+        <div class="btn-group" id="client-buttons">
+          <button type="button" class="choice-btn selected" data-value="MLSTECH / BARDOUX A.">MLSTECH / BARDOUX A.</button>
+          <button type="button" class="choice-btn" data-value="RECEP. (RET. GARANTIE)">RECEP. (RET. GARANTIE)</button>
+          <button type="button" class="choice-btn" data-value="RECEPTION">RECEPTION</button>
+          <button type="button" class="choice-btn" data-value="">Autre</button>
+        </div>
+      </div>
+
+      <button id="btn-add-submit">AJOUTER AU STOCK</button>
+      <button id="btn-add-cancel">Annuler</button>
+    </div>
+  </div>
+
+  <!-- ======== ACTION SHEET (swipe) ======== -->
+  <div id="action-sheet">
+    <div id="action-sheet-content">
+      <h3></h3>
+      <div class="action-subtitle"></div>
+      <div id="action-options"></div>
+      <button id="btn-action-cancel">Annuler</button>
+    </div>
+  </div>
+
+  <!-- ======== BASKET MODAL ======== -->
+  <div id="basket-modal">
+    <div id="basket-content">
+      <h3>Panier Email</h3>
+      <div id="basket-count"></div>
+      <div id="basket-list"></div>
+      <button id="btn-basket-send" class="basket-btn-send">Copier + ouvrir Gmail</button>
+      <button id="btn-basket-clear" class="basket-btn-clear">Vider le panier</button>
+      <button id="btn-basket-close" class="basket-btn-close">Fermer</button>
+    </div>
+  </div>
+
+  <!-- ======== SCAN MODE CHOOSER ======== -->
+  <div id="scan-chooser">
+    <div id="scan-chooser-content">
+      <h3>Scanner / Photo</h3>
+      <div class="action-option blue" id="btn-mode-barcode">
+        <div class="action-icon">📷</div>
+        <div>
+          <div class="action-text">Scan barcode</div>
+          <div class="action-desc">Caméra temps réel — ZXing</div>
+        </div>
+      </div>
+      <div class="action-option green" id="btn-mode-camera">
+        <div class="action-icon">📸</div>
+        <div>
+          <div class="action-text">Photo étiquette</div>
+          <div class="action-desc">Prendre une photo — OCR Tesseract</div>
+        </div>
+      </div>
+      <div class="action-option gray" id="btn-mode-gallery">
+        <div class="action-icon">🖼️</div>
+        <div>
+          <div class="action-text">Depuis la galerie</div>
+          <div class="action-desc">Sélectionner une image existante</div>
+        </div>
+      </div>
+      <button id="btn-scan-chooser-close" class="scan-result-btn-cancel">Annuler</button>
+    </div>
+  </div>
+
+  <!-- ======== OCR OVERLAY ======== -->
+  <div id="ocr-overlay">
+    <input type="file" id="ocr-file-input" accept="image/*" style="display:none;">
+  </div>
+
+  <!-- ======== OCR PROGRESS ======== -->
+  <div id="ocr-progress">
+    <div class="spinner"></div>
+    <div id="ocr-progress-text">Analyse en cours...</div>
+  </div>
+
+  <!-- ======== OCR RESULT ======== -->
+  <div id="ocr-result">
+    <div id="ocr-result-content"></div>
+  </div>
+
+  <!-- ======== SCANNER OVERLAY ======== -->
+  <div id="scanner-overlay">
+    <div id="scanner-header">
+      <h3>Scanner un barcode</h3>
+      <button id="btn-scanner-close">✕</button>
+    </div>
+    <div id="scanner-viewport">
+      <video id="scanner-video" autoplay playsinline muted></video>
+      <div id="scanner-zone">
+        <div class="scan-corner tl"></div>
+        <div class="scan-corner tr"></div>
+        <div class="scan-corner bl"></div>
+        <div class="scan-corner br"></div>
+        <div id="scanner-line"></div>
+      </div>
+    </div>
+    <div id="scanner-status">Initialisation...</div>
+  </div>
+
+  <!-- ======== SCAN RESULT ======== -->
+  <div id="scan-result">
+    <div id="scan-result-content"></div>
+  </div>
+
+  <!-- ======== LEARNING MODE ======== -->
+  <div id="learning-modal">
+    <div id="learning-content"></div>
+  </div>
+
+  <!-- ======== CONFIRM DIALOG ======== -->
+  <div id="confirm-dialog">
+    <div id="confirm-dialog-box">
+      <h3></h3>
+      <p></p>
+      <div class="confirm-buttons">
+        <button id="btn-confirm-no">Annuler</button>
+        <button id="btn-confirm-yes">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== TOAST ======== -->
+  <div id="toast"></div>
+
+  <!-- ======== LOADING ======== -->
+  <div id="loading"><div class="spinner"></div></div>
+
+  <!-- ======== SCRIPTS ======== -->
+  <script src="https://accounts.google.com/gsi/client" onload="onGisLoaded()" async defer></script>
+  <script src="https://apis.google.com/js/api.js" onload="onGapiLoaded()" async defer></script>
+  <script src="zxing.min.js" defer></script>
+  <script src="sheets.js"></script>
+  <script src="ui.js"></script>
+  <script src="gestures.js"></script>
+  <script src="tesseract.min.js"></script>
+  <script src="clipboard.js"></script>
+  <script src="scanner.js"></script>
+  <script src="ocr.js"></script>
+  <script src="rules.js"></script>
+  <script src="offline.js"></script>
+  <script src="app.js"></script>
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('SW registered'))
+        .catch(err => console.error('SW error:', err));
+    }
+  </script>
+
+</body>
+</html>

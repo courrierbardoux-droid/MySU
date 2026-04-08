@@ -1,0 +1,18 @@
+{
+  "name": "MySU — My Stock Unit",
+  "short_name": "MySU",
+  "description": "Inventaire TPE — MLSTECH",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#2F5496",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
