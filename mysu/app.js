@@ -81,7 +81,16 @@ const App = (() => {
     if (tokenClient) {
       tokenClient.requestAccessToken();
     } else {
-      UI.showToast('Google non chargé, réessaie');
+      // Google script not loaded yet — try to init and retry
+      UI.showToast('Chargement Google en cours...');
+      setTimeout(() => {
+        if (typeof google !== 'undefined' && google.accounts) {
+          onGisLoaded();
+          tokenClient.requestAccessToken();
+        } else {
+          UI.showToast('Erreur : Google ne se charge pas. Vérifie ta connexion et recharge la page.');
+        }
+      }, 2000);
     }
   }
 
@@ -129,20 +138,45 @@ const App = (() => {
   // ---- ONBOARDING ----
 
   function onPickExisting() {
-    if (!pickerInited) {
-      UI.showToast('Picker en chargement...');
+    // Show the Sheet ID input dialog instead of Picker (more reliable)
+    document.getElementById('sheet-id-dialog').classList.add('visible');
+  }
+
+  function onSheetIdSubmit() {
+    let input = document.getElementById('sheet-id-input').value.trim();
+    if (!input) {
+      UI.showToast('Colle le lien ou l\'ID du Sheet');
       return;
     }
 
-    const picker = new google.picker.PickerBuilder()
-      .addView(new google.picker.DocsView(google.picker.ViewId.SPREADSHEETS)
-        .setMimeTypes('application/vnd.google-apps.spreadsheet'))
-      .setOAuthToken(accessToken)
-      .setCallback(onPickerCallback)
-      .setTitle('Sélectionner ton inventaire')
-      .build();
+    // Extract ID from full URL if pasted
+    // Format: https://docs.google.com/spreadsheets/d/SHEET_ID/edit...
+    const urlMatch = input.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (urlMatch) {
+      input = urlMatch[1];
+    }
 
-    picker.setVisible(true);
+    sheetId = input;
+    localStorage.setItem('mysu_sheet_id', sheetId);
+    document.getElementById('sheet-id-dialog').classList.remove('visible');
+
+    // Try to read the sheet to verify
+    UI.showLoading(true);
+    Sheets.readStock(sheetId)
+      .then(rows => {
+        localStorage.setItem('mysu_sheet_name', 'Inventaire');
+        showApp();
+        UI.renderTable(rows);
+        UI.showLoading(false);
+        UI.showToast('Sheet connecté !');
+      })
+      .catch(err => {
+        UI.showLoading(false);
+        sheetId = null;
+        localStorage.removeItem('mysu_sheet_id');
+        UI.showToast('Erreur : impossible de lire ce Sheet. Vérifie le lien.');
+        console.error(err);
+      });
   }
 
   function onPickerCallback(data) {
@@ -257,6 +291,10 @@ const App = (() => {
     document.getElementById('btn-login').addEventListener('click', login);
     document.getElementById('btn-pick-existing').addEventListener('click', onPickExisting);
     document.getElementById('btn-create-new').addEventListener('click', onCreateNew);
+    document.getElementById('btn-sheet-id-submit').addEventListener('click', onSheetIdSubmit);
+    document.getElementById('btn-sheet-id-cancel').addEventListener('click', () => {
+      document.getElementById('sheet-id-dialog').classList.remove('visible');
+    });
     document.getElementById('btn-refresh').addEventListener('click', refresh);
   }
 

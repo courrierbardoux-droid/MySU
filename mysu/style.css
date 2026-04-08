@@ -861,6 +861,45 @@ tr.swiping-left { background: var(--red-bg) !important; }
   margin-top: 4px;
 }
 
+/* ---- SHEET ID DIALOG ---- */
+#sheet-id-dialog {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 170;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+#sheet-id-dialog.visible { display: flex; }
+
+#sheet-id-dialog-box {
+  background: white;
+  border-radius: 16px;
+  padding: 28px 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+#sheet-id-dialog-box h3 { color: var(--primary); margin-bottom: 8px; }
+#sheet-id-dialog-box p { color: var(--text-light); font-size: 14px; margin-bottom: 12px; }
+
+#sheet-id-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+}
+
+#sheet-id-input:focus { border-color: var(--primary); }
+
+body.dark-theme #sheet-id-dialog-box { background: #16213e; }
+body.dark-theme #sheet-id-input { background: #1a1a2e; color: #ccc; border-color: #2a2a4a; }
+
 /* ---- LEARNING MODE (Phase 5) ---- */
 #learning-modal {
   display: none;
