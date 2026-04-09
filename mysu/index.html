@@ -339,16 +339,39 @@
   <script src="rules.js"></script>
   <script src="offline.js"></script>
   <script src="app.js"></script>
-  <!-- Google scripts AFTER app.js so onGisLoaded/onGapiLoaded exist -->
-  <script src="https://accounts.google.com/gsi/client" onload="onGisLoaded()" async></script>
-  <script src="https://apis.google.com/js/api.js" onload="onGapiLoaded()" async></script>
-
-  <!-- Service Worker -->
+  <!-- Google scripts loaded dynamically for better error handling -->
   <script>
+    // Load Google scripts with error detection
+    function loadGoogleScript(src, onSuccess, label) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.async = true;
+      s.onload = function() {
+        console.log(label + ' loaded');
+        onSuccess();
+      };
+      s.onerror = function() {
+        console.error(label + ' FAILED to load — blocked or network error');
+      };
+      document.body.appendChild(s);
+    }
+
+    loadGoogleScript(
+      'https://accounts.google.com/gsi/client',
+      onGisLoaded,
+      'GIS'
+    );
+    loadGoogleScript(
+      'https://apis.google.com/js/api.js',
+      onGapiLoaded,
+      'GAPI'
+    );
+
+    // Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('SW registered'))
-        .catch(err => console.error('SW error:', err));
+        .then(function() { console.log('SW registered'); })
+        .catch(function(err) { console.error('SW error:', err); });
     }
   </script>
 

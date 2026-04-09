@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mysu-v5';
+const CACHE_NAME = 'mysu-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -34,14 +34,16 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Network first for API calls, cache first for app shell
-  if (e.request.url.includes('googleapis.com')) {
+  const url = e.request.url;
+  // Always go to network for Google APIs and auth scripts
+  if (url.includes('googleapis.com') || url.includes('accounts.google.com') || url.includes('apis.google.com')) {
     e.respondWith(
       fetch(e.request).catch(() => caches.match(e.request))
     );
-  } else {
-    e.respondWith(
-      caches.match(e.request).then(r => r || fetch(e.request))
-    );
+    return;
   }
+  // Cache first for app shell
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request))
+  );
 });

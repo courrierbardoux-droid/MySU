@@ -101,11 +101,11 @@ const App = (() => {
         clearInterval(retry);
         onGisLoaded();
         tokenClient.requestAccessToken();
-      } else if (attempts >= 10) {
+      } else if (attempts >= 15) {
         clearInterval(retry);
-        UI.showToast('Google ne se charge pas. Recharge la page (tire vers le bas).');
+        UI.showToast('Google bloqué — vérifie ta connexion ou désactive le bloqueur de pubs.');
       }
-    }, 1000);
+    }, 500);
   }
 
   function logout() {
