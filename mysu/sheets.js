@@ -12,9 +12,30 @@ const Sheets = (() => {
 
   // Read all data from the sheet
   async function readStock(sheetId) {
-    const range = encodeURIComponent('Inventaire TPE');
-    const res = await fetch(`${API}/${sheetId}/values/${range}`, { headers: headers() });
-    if (!res.ok) throw new Error('Erreur lecture Sheet: ' + res.status);
+    // Try "Inventaire TPE" tab first
+    let range = encodeURIComponent('Inventaire TPE');
+    let res = await fetch(`${API}/${sheetId}/values/${range}`, { headers: headers() });
+
+    if (res.status === 400) {
+      // Tab not found — try first tab by getting sheet metadata
+      const metaRes = await fetch(`${API}/${sheetId}?fields=sheets.properties.title`, { headers: headers() });
+      if (metaRes.ok) {
+        const meta = await metaRes.json();
+        if (meta.sheets && meta.sheets.length > 0) {
+          const firstTab = meta.sheets[0].properties.title;
+          range = encodeURIComponent(firstTab);
+          res = await fetch(`${API}/${sheetId}/values/${range}`, { headers: headers() });
+        }
+      }
+    }
+
+    if (!res.ok) {
+      const body = await res.text();
+      console.error('Sheet API error:', res.status, body);
+      if (res.status === 403) throw new Error('Accès refusé — vérifie que le Sheet est partagé avec ton compte');
+      if (res.status === 404) throw new Error('Sheet introuvable — vérifie le lien');
+      throw new Error('Erreur lecture Sheet: ' + res.status);
+    }
     const data = await res.json();
     return data.values || [];
   }
