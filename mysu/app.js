@@ -188,8 +188,8 @@ const App = (() => {
         UI.showLoading(false);
         sheetId = null;
         localStorage.removeItem('mysu_sheet_id');
-        UI.showToast('Erreur : ' + (err.message || 'impossible de lire ce Sheet'));
-        console.error('Sheet read error:', err);
+        UI.showToast('Erreur : ' + (err.message || 'impossible de lire ce Sheet — vérifie ta connexion'));
+        console.error('Sheet read error:', err, err.stack);
       });
   }
 

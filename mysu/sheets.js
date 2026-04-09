@@ -32,9 +32,12 @@ const Sheets = (() => {
     if (!res.ok) {
       const body = await res.text();
       console.error('Sheet API error:', res.status, body);
-      if (res.status === 403) throw new Error('Accès refusé — vérifie que le Sheet est partagé avec ton compte');
-      if (res.status === 404) throw new Error('Sheet introuvable — vérifie le lien');
-      throw new Error('Erreur lecture Sheet: ' + res.status);
+      let detail = '';
+      try { detail = JSON.parse(body).error.message; } catch(e) {}
+      if (res.status === 401) throw new Error('Session expirée — reconnecte-toi');
+      if (res.status === 403) throw new Error('Accès refusé (403) — vérifie que le Sheet est partagé avec ton compte Google connecté');
+      if (res.status === 404) throw new Error('Sheet introuvable (404) — vérifie que c\'est un Google Sheet natif (pas un .xlsx)');
+      throw new Error('Erreur Sheet ' + res.status + (detail ? ' : ' + detail : ''));
     }
     const data = await res.json();
     return data.values || [];
